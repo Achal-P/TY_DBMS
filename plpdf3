@@ -1,0 +1,83 @@
+--Write a PL/SQL code to calculate Gross and net salary of the employee 
+Employee (Empid, Name, Basic salary, type) . Type may be Permanent or temporary. 
+For Permanent employees following is the calculation for salary 
+DA - 115% of Basic salary 
+HRA - 12% of basic salary (if HRA is > 20000 then it will be considered as 20000 only) 
+Calculate Gross salary by adding DA and HRA 
+Deductions are  
+Income tax -2000 Rs 
+Net salary= Gross Salary - Deductions 
+For Temporary Only basic salary and deductions are there  
+Prepare a salary table for all--
+
+
+CREATE TABLE Employee ( 
+    Empid NUMBER PRIMARY KEY, 
+    Name VARCHAR2(100), 
+    Basic_salary NUMBER, 
+    Type VARCHAR2(20) CHECK (Type IN ('Permanent', 'Temporary')) 
+); 
+ 
+CREATE TABLE Salary ( 
+    Empid NUMBER, 
+    Gross_salary NUMBER, 
+    Net_salary NUMBER, 
+    CONSTRAINT fk_empid FOREIGN KEY (Empid) REFERENCES Employee(Empid) 
+); 
+ 
+ 
+ 
+DECLARE 
+    v_empid NUMBER; 
+    v_name VARCHAR2(100); 
+    v_basic_salary NUMBER; 
+    v_type VARCHAR2(20); 
+    v_DA NUMBER; 
+    v_HRA NUMBER; 
+    v_gross_salary NUMBER; 
+    v_net_salary NUMBER; 
+    v_deductions NUMBER := 2000;  -- Fixed deduction for income tax 
+ 
+    CURSOR emp_cursor IS 
+        SELECT Empid, Name, Basic_salary, Type 
+        FROM Employee; 
+BEGIN 
+    -- Open cursor to process each employee 
+    FOR emp_rec IN emp_cursor LOOP 
+        v_empid := emp_rec.Empid; 
+        v_name := emp_rec.Name; 
+        v_basic_salary := emp_rec.Basic_salary; 
+        v_type := emp_rec.Type; 
+ 
+        IF v_type = 'Permanent' THEN 
+            -- Calculate DA (115% of basic salary) 
+            v_DA := v_basic_salary * 1.15; 
+ 
+            -- Calculate HRA (12% of basic salary, capped at 20000) 
+            v_HRA := v_basic_salary * 0.12; 
+            IF v_HRA > 20000 THEN 
+                v_HRA := 20000; 
+            END IF; 
+ 
+            -- Calculate Gross salary 
+            v_gross_salary := v_basic_salary + v_DA + v_HRA; 
+ 
+        ELSIF v_type = 'Temporary' THEN 
+            -- For temporary employees, only basic salary is gross salary 
+            v_gross_salary := v_basic_salary; 
+        END IF; 
+ 
+        -- Calculate Net salary (Gross - Deductions) 
+        v_net_salary := v_gross_salary - v_deductions; 
+ 
+        -- Insert calculated salaries into the Salary table 
+        INSERT INTO Salary (Empid, Gross_salary, Net_salary) 
+        VALUES (v_empid, v_gross_salary, v_net_salary); 
+ 
+    END LOOP; 
+ 
+    -- Commit the transaction 
+ 
+ 
+    COMMIT; 
+END;
