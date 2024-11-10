@@ -1,0 +1,327 @@
+-- SQL Queries:
+ Consider the given Database Schema:
+ employee (employee-name, street, city)
+ works (employee-name, company-name, salary)
+ company (company-name, city)
+ manages (employee-name, manager-name)
+ Write SQL queries for the following
+ 1. Create tables employee, works, company, manages. Use proper primary and foreign keys for each table.
+ Company name - First Bank Corporation, Small Bank Corporation, Special Bank Corporation
+ Cities - Pune, Mumbai, Nashik, Delhi, Kolkata
+ Employee names example ‘Raj Shukla’ ‘Sandip Patil’, ‘Shital Sonje’ add your 3 to 4 friends names also 
+ 2. Insert at least 5 to 10 records in each table
+ 3. Add column Birthdate  in employee table
+ 4. Update Birthdate of all employees
+ 5. Delete employee having name ‘Raj Shukla’’, 
+6. Rename salary with monthly_salary
+ 7. Create a table with the name Dependant ( employee-name, dependant_name, relation)
+ 8. Add few rows in dependant table
+ 9. Find difference between Truncate and delete for dependant table
+ 10. Write simple select queries for following
+ a. Find name of the employees starting with ‘S’
+ b. Find the names of all employees who work for First Bank Corporation.
+ c. Find name of the companies located in ‘Pune’
+ d. Find the age of employees
+ e. Find the names and cities of residence of all employees who work for First Bank Corporation
+ f.Find the names of the employees, salary whose salary greater than 50000
+ g. Find the employee names, street addresses, and cities of residence, company name of all employees
+ h. Find the manager of ‘Sandip Patil’
+ i.Find the age of all employees
+ j.Find the names of the employees having their birthday in January--
+
+mysql> create database assi1;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> use assi1;
+Database changed
+mysql> CREATE TABLE employee (
+    ->     employee_name VARCHAR(50) PRIMARY KEY,
+    ->     street VARCHAR(100),
+    ->     city VARCHAR(50),
+    ->     birthdate DATE
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> INSERT INTO employee (employee_name, street, city, birthdate) VALUES
+    -> ('Raj Shukla', 'MG Road', 'Pune', '1988-01-15'),
+    -> ('Sandip Patil', 'Linking Road', 'Mumbai', '1990-06-25'),
+    -> ('Shital Sonje', 'FC Road', 'Nashik', '1985-12-02'),
+    -> ('Amit Kumar', 'Park Street', 'Delhi', '1993-07-19'),
+    -> ('Priya Singh', 'College Road', 'Kolkata', '1989-03-11'),
+    -> ('Rahul Mehta', 'JM Road', 'Pune', '1992-02-21'),
+    -> ('Anjali Sharma', 'Marine Drive', 'Mumbai', '1995-08-14'),
+    -> ('Vikram Joshi', 'Market Road', 'Nashik', '1987-05-30'),
+    -> ('Nisha Agarwal', 'Bandra Street', 'Mumbai', '1990-01-20'),
+    -> ('Karan Patel', 'South Avenue', 'Delhi', '1994-10-03');
+Query OK, 10 rows affected (0.01 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql> show employee;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'employee' at line 1
+mysql> show table employee;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'employee' at line 1
+mysql> show tables employee;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'employee' at line 1
+mysql> CREATE TABLE company (
+    ->     company_name VARCHAR(100) PRIMARY KEY,
+    ->     city VARCHAR(50)
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> INSERT INTO company (company_name, city) VALUES
+    -> ('First Bank Corporation', 'Pune'),
+    -> ('Small Bank Corporation', 'Mumbai'),
+    -> ('Special Bank Corporation', 'Nashik');
+Query OK, 3 rows affected (0.00 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> CREATE TABLE works (
+    ->     employee_name VARCHAR(50),
+    ->     company_name VARCHAR(100),
+    ->     monthly_salary DECIMAL(10, 2),
+    ->     PRIMARY KEY (employee_name, company_name),
+    ->     FOREIGN KEY (employee_name) REFERENCES employee(employee_name),
+    ->     FOREIGN KEY (company_name) REFERENCES company(company_name)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> INSERT INTO works (employee_name, company_name, monthly_salary) VALUES
+    -> ('Raj Shukla', 'First Bank Corporation', 55000),
+    -> ('Sandip Patil', 'Small Bank Corporation', 45000),
+    -> ('Shital Sonje', 'Special Bank Corporation', 47000),
+    -> ('Amit Kumar', 'First Bank Corporation', 60000),
+    -> ('Priya Singh', 'Small Bank Corporation', 53000),
+    -> ('Rahul Mehta', 'First Bank Corporation', 48000),
+    -> ('Anjali Sharma', 'Small Bank Corporation', 45000),
+    -> ('Vikram Joshi', 'Special Bank Corporation', 52000),
+    -> ('Nisha Agarwal', 'First Bank Corporation', 65000),
+    -> ('Karan Patel', 'Small Bank Corporation', 49000);
+Query OK, 10 rows affected (0.01 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql> CREATE TABLE manages (
+    ->     employee_name VARCHAR(50),
+    ->     manager_name VARCHAR(50),
+    ->     PRIMARY KEY (employee_name, manager_name),
+    ->     FOREIGN KEY (employee_name) REFERENCES employee(employee_name),
+    ->     FOREIGN KEY (manager_name) REFERENCES employee(employee_name)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> INSERT INTO manages (employee_name, manager_name) VALUES
+    -> ('Raj Shukla', 'Sandip Patil'),
+    -> ('Shital Sonje', 'Amit Kumar'),
+    -> ('Priya Singh', 'Rahul Mehta'),
+    -> ('Anjali Sharma', 'Vikram Joshi'),
+    -> ('Karan Patel', 'Nisha Agarwal');
+Query OK, 5 rows affected (0.01 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> CREATE TABLE Dependant (
+    ->     employee_name VARCHAR(50),
+    ->     dependant_name VARCHAR(50),
+    ->     relation VARCHAR(50),
+    ->     FOREIGN KEY (employee_name) REFERENCES employee(employee_name)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> INSERT INTO Dependant (employee_name, dependant_name, relation) VALUES
+    -> ('Raj Shukla', 'Ananya Shukla', 'Daughter'),
+    -> ('Sandip Patil', 'Ravi Patil', 'Son'),
+    -> ('Shital Sonje', 'Maya Sonje', 'Spouse'),
+    -> ('Amit Kumar', 'Reena Kumar', 'Spouse'),
+    -> ('Priya Singh', 'Neha Singh', 'Daughter');
+Query OK, 5 rows affected (0.00 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> show tables;
++-----------------+
+| Tables_in_assi1 |
++-----------------+
+| company         |
+| dependant       |
+| employee        |
+| manages         |
+| works           |
++-----------------+
+5 rows in set (0.01 sec)
+
+mysql> SELECT * FROM employee;
++---------------+---------------+---------+------------+
+| employee_name | street        | city    | birthdate  |
++---------------+---------------+---------+------------+
+| Amit Kumar    | Park Street   | Delhi   | 1993-07-19 |
+| Anjali Sharma | Marine Drive  | Mumbai  | 1995-08-14 |
+| Karan Patel   | South Avenue  | Delhi   | 1994-10-03 |
+| Nisha Agarwal | Bandra Street | Mumbai  | 1990-01-20 |
+| Priya Singh   | College Road  | Kolkata | 1989-03-11 |
+| Rahul Mehta   | JM Road       | Pune    | 1992-02-21 |
+| Raj Shukla    | MG Road       | Pune    | 1988-01-15 |
+| Sandip Patil  | Linking Road  | Mumbai  | 1990-06-25 |
+| Shital Sonje  | FC Road       | Nashik  | 1985-12-02 |
+| Vikram Joshi  | Market Road   | Nashik  | 1987-05-30 |
++---------------+---------------+---------+------------+
+10 rows in set (0.00 sec)
+
+mysql> SELECT * FROM works;
++---------------+--------------------------+----------------+
+| employee_name | company_name             | monthly_salary |
++---------------+--------------------------+----------------+
+| Amit Kumar    | First Bank Corporation   |       60000.00 |
+| Anjali Sharma | Small Bank Corporation   |       45000.00 |
+| Karan Patel   | Small Bank Corporation   |       49000.00 |
+| Nisha Agarwal | First Bank Corporation   |       65000.00 |
+| Priya Singh   | Small Bank Corporation   |       53000.00 |
+| Rahul Mehta   | First Bank Corporation   |       48000.00 |
+| Raj Shukla    | First Bank Corporation   |       55000.00 |
+| Sandip Patil  | Small Bank Corporation   |       45000.00 |
+| Shital Sonje  | Special Bank Corporation |       47000.00 |
+| Vikram Joshi  | Special Bank Corporation |       52000.00 |
++---------------+--------------------------+----------------+
+10 rows in set (0.00 sec)
+
+mysql> SELECT * FROM company;
++--------------------------+--------+
+| company_name             | city   |
++--------------------------+--------+
+| First Bank Corporation   | Pune   |
+| Small Bank Corporation   | Mumbai |
+| Special Bank Corporation | Nashik |
++--------------------------+--------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT * FROM manages;
++---------------+---------------+
+| employee_name | manager_name  |
++---------------+---------------+
+| Shital Sonje  | Amit Kumar    |
+| Karan Patel   | Nisha Agarwal |
+| Priya Singh   | Rahul Mehta   |
+| Raj Shukla    | Sandip Patil  |
+| Anjali Sharma | Vikram Joshi  |
++---------------+---------------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT * FROM dependant;
++---------------+----------------+----------+
+| employee_name | dependant_name | relation |
++---------------+----------------+----------+
+| Raj Shukla    | Ananya Shukla  | Daughter |
+| Sandip Patil  | Ravi Patil     | Son      |
+| Shital Sonje  | Maya Sonje     | Spouse   |
+| Amit Kumar    | Reena Kumar    | Spouse   |
+| Priya Singh   | Neha Singh     | Daughter |
++---------------+----------------+----------+
+5 rows in set (0.00 sec)
+
+mysql> DELETE FROM employee WHERE employee_name = 'Raj Shukla';
+ERROR 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails (`assi1`.`dependant`, CONSTRAINT `dependant_ibfk_1` FOREIGN KEY (`employee_name`) REFERENCES `employee` (`employee_name`))
+mysql> DELETE FROM employee WHERE employee_name = 'Raj Shukla';
+ERROR 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails (`assi1`.`dependant`, CONSTRAINT `dependant_ibfk_1` FOREIGN KEY (`employee_name`) REFERENCES `employee` (`employee_name`))
+mysql> SELECT employee_name FROM employee WHERE employee_name LIKE 'S%';
++---------------+
+| employee_name |
++---------------+
+| Sandip Patil  |
+| Shital Sonje  |
++---------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT employee_name FROM works WHERE company_name = 'First Bank Corporation';
++---------------+
+| employee_name |
++---------------+
+| Amit Kumar    |
+| Nisha Agarwal |
+| Rahul Mehta   |
+| Raj Shukla    |
++---------------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT company_name FROM company WHERE city = 'Pune';
++------------------------+
+| company_name           |
++------------------------+
+| First Bank Corporation |
++------------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT employee_name, YEAR(CURDATE()) - YEAR(birthdate) AS age FROM employee;
++---------------+------+
+| employee_name | age  |
++---------------+------+
+| Amit Kumar    |   31 |
+| Anjali Sharma |   29 |
+| Karan Patel   |   30 |
+| Nisha Agarwal |   34 |
+| Priya Singh   |   35 |
+| Rahul Mehta   |   32 |
+| Raj Shukla    |   36 |
+| Sandip Patil  |   34 |
+| Shital Sonje  |   39 |
+| Vikram Joshi  |   37 |
++---------------+------+
+10 rows in set (0.00 sec)
+
+mysql> SELECT e.employee_name, e.city
+    -> FROM employee e
+    -> JOIN works w ON e.employee_name = w.employee_name
+    -> WHERE w.company_name = 'First Bank Corporation';
++---------------+--------+
+| employee_name | city   |
++---------------+--------+
+| Amit Kumar    | Delhi  |
+| Nisha Agarwal | Mumbai |
+| Rahul Mehta   | Pune   |
+| Raj Shukla    | Pune   |
++---------------+--------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT employee_name, monthly_salary
+    -> FROM works
+    -> WHERE monthly_salary > 50000;
++---------------+----------------+
+| employee_name | monthly_salary |
++---------------+----------------+
+| Amit Kumar    |       60000.00 |
+| Nisha Agarwal |       65000.00 |
+| Priya Singh   |       53000.00 |
+| Raj Shukla    |       55000.00 |
+| Vikram Joshi  |       52000.00 |
++---------------+----------------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT e.employee_name, e.street, e.city, w.company_name
+    -> FROM employee e
+    -> JOIN works w ON e.employee_name = w.employee_name;
++---------------+---------------+---------+--------------------------+
+| employee_name | street        | city    | company_name             |
++---------------+---------------+---------+--------------------------+
+| Amit Kumar    | Park Street   | Delhi   | First Bank Corporation   |
+| Anjali Sharma | Marine Drive  | Mumbai  | Small Bank Corporation   |
+| Karan Patel   | South Avenue  | Delhi   | Small Bank Corporation   |
+| Nisha Agarwal | Bandra Street | Mumbai  | First Bank Corporation   |
+| Priya Singh   | College Road  | Kolkata | Small Bank Corporation   |
+| Rahul Mehta   | JM Road       | Pune    | First Bank Corporation   |
+| Raj Shukla    | MG Road       | Pune    | First Bank Corporation   |
+| Sandip Patil  | Linking Road  | Mumbai  | Small Bank Corporation   |
+| Shital Sonje  | FC Road       | Nashik  | Special Bank Corporation |
+| Vikram Joshi  | Market Road   | Nashik  | Special Bank Corporation |
++---------------+---------------+---------+--------------------------+
+10 rows in set (0.00 sec)
+
+mysql> SELECT manager_name FROM manages WHERE employee_name = 'Sandip Patil';
+Empty set (0.00 sec)
+
+mysql> SELECT employee_name FROM employee WHERE MONTH(birthdate) = 1;
++---------------+
+| employee_name |
++---------------+
+| Nisha Agarwal |
+| Raj Shukla    |
++---------------+
+2 rows in set (0.00 sec)
+
+mysql> commit;
+Query OK, 0 rows affected (0.00 sec)
+
