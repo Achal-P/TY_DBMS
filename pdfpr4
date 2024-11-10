@@ -1,0 +1,170 @@
+--Physician (reg_no, name, tel_no, city) 
+Patient (p_name, street, city) 
+visit(p_name, reg_no, date_of _visit, fees) 
+1. Create tables and insert values --
+
+mysql> usefilepr4;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'usefilepr4' at line 1
+mysql> use filepr4;
+Database changed
+mysql> CREATE TABLE Physician (
+    ->     reg_no INT PRIMARY KEY,
+    ->     name VARCHAR(100),
+    ->     tel_no VARCHAR(15),
+    ->     city VARCHAR(50)
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql>
+    ->
+    ->
+    -> CREATE TABLE Patient (
+    ->     p_name VARCHAR(100) PRIMARY KEY,
+    ->     street VARCHAR(100),
+    ->     city VARCHAR(50)
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+mysql>  -- Insert sample values for demonstration
+    -> INSERT INTO Physician (reg_no, name, tel_no, city) VALUES (1, 'Dr. Sharma',
+    -> '1234567890', 'Mumbai');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> INSERT INTO Physician (reg_no, name, tel_no, city) VALUES (2, 'Dr. Mehta',
+    -> '0987654321', 'Nashik');
+Query OK, 1 row affected (0.00 sec)
+
+mysql>
+    -> INSERT INTO Patient (p_name, street, city) VALUES ('Dipak', '123 Main St', 'Nashik');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> INSERT INTO Patient (p_name, street, city) VALUES ('Mina', '456 Park Ave', 'Pune');
+Query OK, 1 row affected (0.00 sec)
+mysql> DROP TABLE IF EXISTS visit;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> CREATE TABLE visit (
+    ->     p_name VARCHAR(100),
+    ->     reg_no INT,
+    ->     date_of_visit DATE,
+    ->     fees DECIMAL(10, 2),
+    ->     PRIMARY KEY (p_name, reg_no, date_of_visit),
+    ->     FOREIGN KEY (p_name) REFERENCES Patient(p_name),
+    ->     FOREIGN KEY (reg_no) REFERENCES Physician(reg_no)
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> INSERT INTO visit (p_name, reg_no, date_of_visit, fees) VALUES ('Dipak', 1, '2017-07-13', 6000);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> INSERT INTO visit (p_name, reg_no, date_of_visit, fees) VALUES ('Mina', 2, '2017-07-13', 4500);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> show tables ;
++-------------------+
+| Tables_in_filepr4 |
++-------------------+
+| patient           |
+| physician         |
+| visit             |
++-------------------+
+3 rows in set (0.00 sec)
+
+mysql> DELETE FROM Patient
+    -> WHERE p_name = 'Dipak';
+ERROR 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails (`filepr4`.`visit`, CONSTRAINT `visit_ibfk_1` FOREIGN KEY (`p_name`) REFERENCES `patient` (`p_name`))
+mysql>
+    -> INSERT INTO Patient (p_name, street, city) VALUES ('Dipak', '123 Main St', 'Nashik');
+ERROR 1062 (23000): Duplicate entry 'Dipak' for key 'patient.PRIMARY'
+mysql> INSERT INTO Patient (p_name, street, city) VALUES ('Mina', '456 Park Ave', 'Pune');
+ERROR 1062 (23000): Duplicate entry 'Mina' for key 'patient.PRIMARY'
+mysql> -- Delete from visit table where p_name is 'Dipak'
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> DELETE FROM visit WHERE p_name = 'Dipak';
+Query OK, 1 row affected (0.00 sec)
+
+mysql>
+mysql> -- Now delete from Patient table
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> DELETE FROM Patient WHERE p_name = 'Dipak';
+Query OK, 1 row affected (0.00 sec)
+
+mysql> SELECT *
+    -> FROM Patient
+    -> WHERE city = 'Nashik';
+Empty set (0.00 sec)
+
+mysql> SELECT COUNT(*) AS physician_count
+    -> FROM Physician
+    -> WHERE city = 'Mumbai';
++-----------------+
+| physician_count |
++-----------------+
+|               1 |
++-----------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT p_name
+    -> FROM Patient
+    ->
+    ->
+    -> ORDER BY p_name ASC;
++--------+
+| p_name |
++--------+
+| Mina   |
++--------+
+1 row in set (0.00 sec)
+
+mysql> SELECT p_name, fees
+    -> FROM visit
+    -> WHERE fees > 5000;
+Empty set (0.00 sec)
+
+mysql> SELECT p.p_name, p.city
+    -> FROM Patient p
+    -> JOIN visit v ON p.p_name = v.p_name
+    -> WHERE v.date_of_visit = '2017-07-13';
++--------+------+
+| p_name | city |
++--------+------+
+| Mina   | Pune |
++--------+------+
+1 row in set (0.00 sec)
+
+mysql> SELECT ph.name, COUNT(v.p_name) AS patient_count
+    -> FROM Physician ph
+    -> JOIN visit v ON ph.reg_no = v.reg_no
+    -> GROUP BY ph.name;
++-----------+---------------+
+| name      | patient_count |
++-----------+---------------+
+| Dr. Mehta |             1 |
++-----------+---------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT date_of_visit, SUM(fees) AS total_fees
+    -> FROM visit
+    -> GROUP BY date_of_visit;
++---------------+------------+
+| date_of_visit | total_fees |
++---------------+------------+
+| 2017-07-13    |    4500.00 |
++---------------+------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT ph.name
+    -> FROM Physician ph
+    -> JOIN visit v ON ph.reg_no = v.reg_no
+    -> WHERE v.p_name = 'Mina';
++-----------+
+| name      |
++-----------+
+| Dr. Mehta |
++-----------+
+1 row in set (0.00 sec)
+
+mysql> commit;
+Query OK, 0 rows affected (0.00 sec)
+
