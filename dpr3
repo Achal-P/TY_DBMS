@@ -1,0 +1,307 @@
+--SQL Queries:
+
+Consider the given Database Schema:
+employee (employee-name, street, city)
+works (employee-name, company-name, salary)
+company (company-name, city)
+manages (employee-name, manager-name)
+
+Write SQL queries for the following
+1. Find the names of all employees who work for First Bank Corporation.
+2. Find the names and cities of residence of all employees who work for First Bank Corporation
+3. Find the names, street addresses, and cities of residence of all employees who work for First Bank Corporation and earn more than Rs.10,000.
+4. Find all employees in the database who live in the same cities as the companies for which they work.
+5. Find all employees in the database who live in the same cities and on the same streets as do their managers.
+6. Find all employees in the database who do not work for First Bank Corporation.
+7. Find all employees in the database who earn more than each employee of Small Bank Corporation.
+8. Assume that the companies may be located in several cities. Find all companies located in every city in which Small Bank Corporation is located.
+9. Find all employees who earn more than the average salary of all employees of their company.
+10. Find the company that has the most employees.
+11. Find the company that has the smallest payroll.
+12. Find those companies whose employees earn a higher salary, on average, than the average salary at First Bank Corporation.--
+
+mysql> create database assi3;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> use assi3;
+Database changed
+mysql> CREATE TABLE employee (
+    ->     employee_name VARCHAR(50) PRIMARY KEY,
+    ->     street VARCHAR(100),
+    ->     city VARCHAR(50)
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> CREATE TABLE company (
+    ->     company_name VARCHAR(100) PRIMARY KEY,
+    ->     city VARCHAR(50)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE works (
+    ->     employee_name VARCHAR(50),
+    ->     company_name VARCHAR(100),
+    ->     salary DECIMAL(10, 2),
+    ->     PRIMARY KEY (employee_name, company_name),
+    ->     FOREIGN KEY (employee_name) REFERENCES employee(employee_name),
+    ->     FOREIGN KEY (company_name) REFERENCES company(company_name)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE manages (
+    ->     employee_name VARCHAR(50),
+    ->     manager_name VARCHAR(50),
+    ->     PRIMARY KEY (employee_name, manager_name),
+    ->     FOREIGN KEY (employee_name) REFERENCES employee(employee_name),
+    ->     FOREIGN KEY (manager_name) REFERENCES employee(employee_name)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> INSERT INTO company (company_name, city) VALUES
+    -> ('First Bank Corporation', 'Pune'),
+    -> ('Small Bank Corporation', 'Mumbai'),
+    -> ('Special Bank Corporation', 'Nashik');
+Query OK, 3 rows affected (0.01 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO employee (employee_name, street, city) VALUES
+    -> ('Raj Shukla', 'MG Road', 'Pune'),
+    -> ('Sandip Patil', 'Linking Road', 'Mumbai'),
+    -> ('Shital Sonje', 'FC Road', 'Nashik'),
+    -> ('Amit Kumar', 'Park Street', 'Delhi'),
+    -> ('Priya Singh', 'College Road', 'Kolkata'),
+    -> ('Rahul Mehta', 'JM Road', 'Pune');
+Query OK, 6 rows affected (0.00 sec)
+Records: 6  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO works (employee_name, company_name, salary) VALUES
+    -> ('Raj Shukla', 'First Bank Corporation', 12000),
+    -> ('Sandip Patil', 'Small Bank Corporation', 8000),
+    -> ('Shital Sonje', 'Special Bank Corporation', 9500),
+    -> ('Amit Kumar', 'First Bank Corporation', 15000),
+    -> ('Priya Singh', 'Small Bank Corporation', 10500),
+    -> ('Rahul Mehta', 'First Bank Corporation', 11000);
+Query OK, 6 rows affected (0.00 sec)
+Records: 6  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO manages (employee_name, manager_name) VALUES
+    -> ('Raj Shukla', 'Sandip Patil'),
+    -> ('Shital Sonje', 'Amit Kumar'),
+    -> ('Priya Singh', 'Rahul Mehta');
+Query OK, 3 rows affected (0.00 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> SHOW TABLES;
++-----------------+
+| Tables_in_assi3 |
++-----------------+
+| company         |
+| employee        |
+| manages         |
+| works           |
++-----------------+
+4 rows in set (0.00 sec)
+
+mysql>
+mysql> SELECT * FROM company;
++--------------------------+--------+
+| company_name             | city   |
++--------------------------+--------+
+| First Bank Corporation   | Pune   |
+| Small Bank Corporation   | Mumbai |
+| Special Bank Corporation | Nashik |
++--------------------------+--------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT * FROM employee;
++---------------+--------------+---------+
+| employee_name | street       | city    |
++---------------+--------------+---------+
+| Amit Kumar    | Park Street  | Delhi   |
+| Priya Singh   | College Road | Kolkata |
+| Rahul Mehta   | JM Road      | Pune    |
+| Raj Shukla    | MG Road      | Pune    |
+| Sandip Patil  | Linking Road | Mumbai  |
+| Shital Sonje  | FC Road      | Nashik  |
++---------------+--------------+---------+
+6 rows in set (0.00 sec)
+
+mysql> SELECT * FROM works;
++---------------+--------------------------+----------+
+| employee_name | company_name             | salary   |
++---------------+--------------------------+----------+
+| Amit Kumar    | First Bank Corporation   | 15000.00 |
+| Priya Singh   | Small Bank Corporation   | 10500.00 |
+| Rahul Mehta   | First Bank Corporation   | 11000.00 |
+| Raj Shukla    | First Bank Corporation   | 12000.00 |
+| Sandip Patil  | Small Bank Corporation   |  8000.00 |
+| Shital Sonje  | Special Bank Corporation |  9500.00 |
++---------------+--------------------------+----------+
+6 rows in set (0.00 sec)
+
+mysql> SELECT * FROM manages;
++---------------+--------------+
+| employee_name | manager_name |
++---------------+--------------+
+| Shital Sonje  | Amit Kumar   |
+| Priya Singh   | Rahul Mehta  |
+| Raj Shukla    | Sandip Patil |
++---------------+--------------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT employee_name
+    -> FROM works
+    -> WHERE company_name = 'First Bank Corporation';
++---------------+
+| employee_name |
++---------------+
+| Amit Kumar    |
+| Rahul Mehta   |
+| Raj Shukla    |
++---------------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT e.employee_name, e.city
+    -> FROM employee e
+    -> JOIN works w ON e.employee_name = w.employee_name
+    -> WHERE w.company_name = 'First Bank Corporation';
++---------------+-------+
+| employee_name | city  |
++---------------+-------+
+| Amit Kumar    | Delhi |
+| Rahul Mehta   | Pune  |
+| Raj Shukla    | Pune  |
++---------------+-------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT e.employee_name, e.street, e.city
+    -> FROM employee e
+    -> JOIN works w ON e.employee_name = w.employee_name
+    -> WHERE w.company_name = 'First Bank Corporation' AND w.salary > 10000;
++---------------+-------------+-------+
+| employee_name | street      | city  |
++---------------+-------------+-------+
+| Amit Kumar    | Park Street | Delhi |
+| Rahul Mehta   | JM Road     | Pune  |
+| Raj Shukla    | MG Road     | Pune  |
++---------------+-------------+-------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT e.employee_name
+    -> FROM employee e
+    -> JOIN works w ON e.employee_name = w.employee_name
+    -> JOIN company c ON w.company_name = c.company_name
+    -> WHERE e.city = c.city;
++---------------+
+| employee_name |
++---------------+
+| Rahul Mehta   |
+| Raj Shukla    |
+| Sandip Patil  |
+| Shital Sonje  |
++---------------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT e.employee_name
+    -> FROM employee e
+    -> JOIN manages m ON e.employee_name = m.employee_name
+    -> JOIN employee mng ON m.manager_name = mng.employee_name
+    -> WHERE e.city = mng.city AND e.street = mng.street;
+Empty set (0.00 sec)
+
+mysql> SELECT e.employee_name
+    -> FROM employee e
+    -> JOIN works w ON e.employee_name = w.employee_name
+    -> WHERE w.company_name <> 'First Bank Corporation';
++---------------+
+| employee_name |
++---------------+
+| Priya Singh   |
+| Sandip Patil  |
+| Shital Sonje  |
++---------------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT e.employee_name
+    -> FROM employee e
+    -> JOIN works w ON e.employee_name = w.employee_name
+    -> WHERE w.salary > ALL (
+    ->     SELECT salary
+    ->     FROM works
+    ->     WHERE company_name = 'Small Bank Corporation'
+    -> );
++---------------+
+| employee_name |
++---------------+
+| Amit Kumar    |
+| Rahul Mehta   |
+| Raj Shukla    |
++---------------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT DISTINCT c.company_name
+    -> FROM company c
+    -> WHERE NOT EXISTS (
+    ->     SELECT city
+    ->     FROM company sc
+    ->     WHERE sc.company_name = 'Small Bank Corporation'
+    ->     AND sc.city NOT IN (SELECT city FROM company WHERE company_name = c.company_name)
+    -> );
++------------------------+
+| company_name           |
++------------------------+
+| Small Bank Corporation |
++------------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT w.employee_name
+    -> FROM works w
+    -> JOIN (SELECT company_name, AVG(salary) AS avg_salary
+    ->       FROM works
+    ->       GROUP BY company_name) AS avg_salaries
+    -> ON w.company_name = avg_salaries.company_name
+    -> WHERE w.salary > avg_salaries.avg_salary;
++---------------+
+| employee_name |
++---------------+
+| Amit Kumar    |
+| Priya Singh   |
++---------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT company_name
+    -> FROM works
+    -> GROUP BY company_name
+    -> ORDER BY COUNT(employee_name) DESC
+    -> LIMIT 1;
++------------------------+
+| company_name           |
++------------------------+
+| First Bank Corporation |
++------------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT company_name
+    -> FROM works
+    -> GROUP BY company_name
+    -> ORDER BY SUM(salary) ASC
+    -> LIMIT 1;
++--------------------------+
+| company_name             |
++--------------------------+
+| Special Bank Corporation |
++--------------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT company_name
+    -> FROM works
+    -> GROUP BY company_name
+    -> HAVING AVG(salary) > (
+    ->     SELECT AVG(salary)
+    ->     FROM works
+    ->     WHERE company_name = 'First Bank Corporation'
+    -> );
+Empty set (0.00 sec)
+
+mysql> commit;
+Query OK, 0 rows affected (0.00 sec)
