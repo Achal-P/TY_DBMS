@@ -1,0 +1,278 @@
+--Employees  (name, empid, address, city, dob, date_of_joining,gender, salary, deptno) 
+Gender must take value ‘M’ or ‘F’. 
+Project(Projectid, title,city). 
+Works (empid , Projectid, total_hrs_worked); 
+Dependant(empid, name_of_dependant, age, relation) 
+Primary Key is underlined. 
+1. Develop DDL to implement the above schema enforcing primary key, check constraints (F 
+and M for gender) and foreign key constraints. 
+2. Insert data in each table .  
+3. Add column Mobile number in employee table 
+4. Update mobile numbers for each employee. 
+5. Develop DML to Populate Database 
+6. Develop a SQL query to list employees  having name starting with ‘S’ 
+7. Develop a SQL query to list department having location ‘Building 1’ --
+
+
+mysql> create database dbmsprendsem;
+Query OK, 1 row affected (0.01 sec)
+mysql> use dbmsprendsem;
+Database changed
+mysql> -- Create Dept table
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> CREATE TABLE Dept (
+    ->     Deptno INT PRIMARY KEY,
+    ->     Name VARCHAR(100),
+    ->     Location VARCHAR(100),
+    ->     Managerempid INT
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql>  -- Create Employees table
+    -> CREATE TABLE Employees (
+    ->     name VARCHAR(100),
+    ->     empid INT PRIMARY KEY,
+    ->     address VARCHAR(255),
+    ->     city VARCHAR(100),
+    ->     dob DATE,
+    ->     date_of_joining DATE,
+    ->     gender CHAR(1) CHECK (gender IN ('M', 'F')),
+    ->     salary DECIMAL(10, 2),
+    ->     deptno INT,
+    ->     FOREIGN KEY (deptno) REFERENCES Dept(Deptno)
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql>  -- Create Project table
+    -> CREATE TABLE Project (
+    ->     Projectid INT PRIMARY KEY,
+    ->
+    ->
+    ->     title VARCHAR(100),
+    ->     city VARCHAR(100)
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+      
+
+mysql>  -- Create Works table
+    -> CREATE TABLE Works (
+    ->     empid INT,
+    ->     Projectid INT,
+    ->     total_hrs_worked INT,
+    ->     PRIMARY KEY (empid, Projectid),
+    ->     FOREIGN KEY (empid) REFERENCES Employees(empid),
+    ->     FOREIGN KEY (Projectid) REFERENCES Project(Projectid)
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql>  -- Create Dependant table
+    -> CREATE TABLE Dependant (
+    ->     empid INT,
+    ->     name_of_dependant VARCHAR(100),
+    ->     age INT,
+    ->     relation VARCHAR(50),
+    ->     PRIMARY KEY (empid, name_of_dependant),
+    ->     FOREIGN KEY (empid) REFERENCES Employees(empid)
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> -- Insert data into Dept table
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> INSERT INTO Dept (Deptno, Name, Location, Managerempid)
+    -> VALUES (1, 'HR', 'Building 1', 101),
+    ->        (2, 'IT', 'Building 2', 102),
+    ->        (3, 'Finance', 'Building 1', 103);
+Query OK, 3 rows affected (0.01 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql>  -- Insert data into Employees table
+    -> INSERT INTO Employees (name, empid, address, city, dob, date_of_joining, gender,
+    -> salary, deptno)
+    -> VALUES ('John Doe', 101, '123 Street A', 'City X', '1980-01-15', '2018-02-01', 'M',
+    -> 50000, 1),
+    ->        ('Sarah Lee', 102, '456 Street B', 'City Y', '1990-05-20', '2019-06-15', 'F',
+    -> 60000, 2),
+    ->        ('Sam Smith', 103, '789 Street C', 'City Z', '1985-10-05', '2020-08-10', 'M',
+    -> 70000, 3);
+Query OK, 3 rows affected (0.00 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql>  -- Insert data into Project table
+    -> INSERT INTO Project (Projectid, title, city)
+    -> VALUES (1, 'Project Alpha', 'City X'),
+    ->        (2, 'Project Beta', 'City Y'),
+    ->        (3, 'Project Gamma', 'City Z');
+Query OK, 3 rows affected (0.00 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql>  -- Insert data into Works table
+    -> INSERT INTO Works (empid, Projectid, total_hrs_worked)
+    -> VALUES (101, 1, 120),
+    ->
+    ->
+    ->        (102, 2, 150),
+    ->        (103, 3, 200);
+Query OK, 3 rows affected (0.00 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql>  -- Insert data into Dependant table
+    -> INSERT INTO Dependant (empid, name_of_dependant, age, relation)
+    -> VALUES (101, 'Alice Doe', 15, 'Daughter'),
+    ->        (102, 'Bob Lee', 10, 'Son'),
+    ->        (103, 'Eve Smith', 5, 'Daughter');
+Query OK, 3 rows affected (0.00 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> show  tables;
++------------------------+
+| Tables_in_dbmsprendsem |
++------------------------+
+| dependant              |
+| dept                   |
+| employees              |
+| project                |
+| works                  |
++------------------------+
+5 rows in set (0.00 sec)
+
+mysql> select * from dependant;
++-------+-------------------+------+----------+
+| empid | name_of_dependant | age  | relation |
++-------+-------------------+------+----------+
+|   101 | Alice Doe         |   15 | Daughter |
+|   102 | Bob Lee           |   10 | Son      |
+|   103 | Eve Smith         |    5 | Daughter |
++-------+-------------------+------+----------+
+3 rows in set (0.00 sec)
+
+mysql> select * from dept;
++--------+---------+------------+--------------+
+| Deptno | Name    | Location   | Managerempid |
++--------+---------+------------+--------------+
+|      1 | HR      | Building 1 |          101 |
+|      2 | IT      | Building 2 |          102 |
+|      3 | Finance | Building 1 |          103 |
++--------+---------+------------+--------------+
+3 rows in set (0.00 sec)
+
+mysql> select * from employees;
++-----------+-------+--------------+--------+------------+-----------------+--------+----------+--------+
+| name      | empid | address      | city   | dob        | date_of_joining | gender | salary   | deptno |
++-----------+-------+--------------+--------+------------+-----------------+--------+----------+--------+
+| John Doe  |   101 | 123 Street A | City X | 1980-01-15 | 2018-02-01      | M      | 50000.00 |      1 |
+| Sarah Lee |   102 | 456 Street B | City Y | 1990-05-20 | 2019-06-15      | F      | 60000.00 |      2 |
+| Sam Smith |   103 | 789 Street C | City Z | 1985-10-05 | 2020-08-10      | M      | 70000.00 |      3 |
++-----------+-------+--------------+--------+------------+-----------------+--------+----------+--------+
+3 rows in set (0.00 sec)
+
+mysql> select * from  projects;
+ERROR 1146 (42S02): Table 'dbmsprendsem.projects' doesn't exist
+mysql> select * from  project;
++-----------+---------------+--------+
+| Projectid | title         | city   |
++-----------+---------------+--------+
+|         1 | Project Alpha | City X |
+|         2 | Project Beta  | City Y |
+|         3 | Project Gamma | City Z |
++-----------+---------------+--------+
+3 rows in set (0.00 sec)
+
+mysql> select * from  works;
++-------+-----------+------------------+
+| empid | Projectid | total_hrs_worked |
++-------+-----------+------------------+
+|   101 |         1 |              120 |
+|   102 |         2 |              150 |
+|   103 |         3 |              200 |
++-------+-----------+------------------+
+3 rows in set (0.00 sec)
+
+mysql> ALTER TABLE Employees
+    -> ADD COLUMN mobile_number VARCHAR(15);
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> select * from employees;
++-----------+-------+--------------+--------+------------+-----------------+--------+----------+--------+---------------+
+| name      | empid | address      | city   | dob        | date_of_joining | gender | salary   | deptno | mobile_number |
++-----------+-------+--------------+--------+------------+-----------------+--------+----------+--------+---------------+
+| John Doe  |   101 | 123 Street A | City X | 1980-01-15 | 2018-02-01      | M      | 50000.00 |      1 | NULL
+|
+| Sarah Lee |   102 | 456 Street B | City Y | 1990-05-20 | 2019-06-15      | F      | 60000.00 |      2 | NULL          |
+| Sam Smith |   103 | 789 Street C | City Z | 1985-10-05 | 2020-08-10      | M      | 70000.00 |      3 | NULL
+|
++-----------+-------+--------------+--------+------------+-----------------+--------+----------+--------+---------------+
+3 rows in set (0.00 sec)
+
+mysql> UPDATE Employees
+    -> SET mobile_number = '1234567890'
+    -> WHERE empid = 101;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql>
+    -> UPDATE Employees
+    -> SET mobile_number = '2345678901'
+    -> WHERE empid = 102;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql>
+    -> UPDATE Employees
+    -> SET mobile_number = '3456789012'
+    -> WHERE empid = 103;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> select *fromm employees;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'fromm employees' at line 1
+mysql> select *from employees;
++-----------+-------+--------------+--------+------------+-----------------+--------+----------+--------+---------------+
+| name      | empid | address      | city   | dob        | date_of_joining | gender | salary   | deptno | mobile_number |
++-----------+-------+--------------+--------+------------+-----------------+--------+----------+--------+---------------+
+| John Doe  |   101 | 123 Street A | City X | 1980-01-15 | 2018-02-01      | M      | 50000.00 |      1 | 1234567890    |
+| Sarah Lee |   102 | 456 Street B | City Y | 1990-05-20 | 2019-06-15      | F      | 60000.00 |      2 | 2345678901    |
+| Sam Smith |   103 | 789 Street C | City Z | 1985-10-05 | 2020-08-10      | M      | 70000.00 |      3 | 3456789012    |
++-----------+-------+--------------+--------+------------+-----------------+--------+----------+--------+---------------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Employees
+    -> WHERE name LIKE 'S%';
++-----------+-------+--------------+--------+------------+-----------------+--------+----------+--------+---------------+
+| name      | empid | address      | city   | dob        | date_of_joining | gender | salary   | deptno | mobile_number |
++-----------+-------+--------------+--------+------------+-----------------+--------+----------+--------+---------------+
+| Sarah Lee |   102 | 456 Street B | City Y | 1990-05-20 | 2019-06-15      | F      | 60000.00 |      2 | 2345678901    |
+| Sam Smith |   103 | 789 Street C | City Z | 1985-10-05 | 2020-08-10      | M      | 70000.00 |      3 | 3456789012    |
++-----------+-------+--------------+--------+------------+-----------------+--------+----------+--------+---------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Dept
+    -> WHERE Location = 'Building 1';
++--------+---------+------------+--------------+
+| Deptno | Name    | Location   | Managerempid |
++--------+---------+------------+--------------+
+|      1 | HR      | Building 1 |          101 |
+|      3 | Finance | Building 1 |          103 |
++--------+---------+------------+--------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Employees
+    -> WHERE YEAR(date_of_joining) BETWEEN 2019 AND 2020;
++-----------+-------+--------------+--------+------------+-----------------+--------+----------+--------+---------------+
+| name      | empid | address      | city   | dob        | date_of_joining | gender | salary   | deptno | mobile_number |
++-----------+-------+--------------+--------+------------+-----------------+--------+----------+--------+---------------+
+| Sarah Lee |   102 | 456 Street B | City Y | 1990-05-20 | 2019-06-15      | F      | 60000.00 |      2 | 2345678901    |
+| Sam Smith |   103 | 789 Street C | City Z | 1985-10-05 | 2020-08-10      | M      | 70000.00 |      3 | 3456789012    |
++-----------+-------+--------------+--------+------------+-----------------+--------+----------+--------+---------------+
+2 rows in set (0.00 sec)
+
+mysql> -- Additional data can be inserted as needed, using similar INSERT INTO statements
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> INSERT INTO Employees (name, empid, address, city, dob, date_of_joining, gender, salary, deptno, mobile_number) VALUES
+    -> ('Sam White', 103, '789 Oak St', 'Chicago', '1988-07-15', '2015-03-20', 'M', 55000, 1, '555-123-4567');
+ERROR 1062 (23000): Duplicate entry '103' for key 'employees.PRIMARY'
+mysql> create database  fileq2;
+Query OK, 1 row affected (0.01 sec)
