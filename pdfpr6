@@ -1,0 +1,140 @@
+--Consider the following schema 
+account(acc-no,branch-name,balance) 
+depositor(cust-name,acc-no) 
+borrower (cust-name, loan-no) 
+loan (loan - no, branch - name, amount) 
+Write following queries using SQL 
+1. Create tables using proper primary keys --
+
+mysql> create database flepr6;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> use flepr6;
+Database changed
+mysql> CREATE TABLE account (
+    ->     acc_no INT PRIMARY KEY,
+    ->     branch_name VARCHAR(50),
+    ->     balance DECIMAL(15, 2)
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql>
+    -> CREATE TABLE depositor (
+    ->     cust_name VARCHAR(100),
+    ->     acc_no INT,
+    ->     PRIMARY KEY (cust_name, acc_no),
+    ->     FOREIGN KEY (acc_no) REFERENCES account(acc_no)
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql>
+    -> CREATE TABLE borrower (
+    ->     cust_name VARCHAR(100),
+    ->     loan_no INT,
+    ->     PRIMARY KEY (cust_name, loan_no),
+    ->     FOREIGN KEY (loan_no) REFERENCES loan(loan_no)
+    -> );
+ERROR 1824 (HY000): Failed to open the referenced table 'loan'
+mysql>
+    -> CREATE TABLE loan (
+    ->     loan_no INT PRIMARY KEY,
+    ->     branch_name VARCHAR(50),
+    ->     amount DECIMAL(15, 2)
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> show tables;
++------------------+
+| Tables_in_flepr6 |
++------------------+
+| account          |
+| depositor        |
+| loan             |
++------------------+
+3 rows in set (0.00 sec)
+
+mysql> UPDATE account
+    -> SET branch_name = 'New Branch', balance = 150000
+    -> WHERE acc_no = 123456; -- Use the specific account number of the customer you want to
+Query OK, 0 rows affected (0.00 sec)
+Rows matched: 0  Changed: 0  Warnings: 0
+
+mysql> update
+    -> ;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1
+mysql> SELECT b.cust_name
+    -> FROM borrower b
+    -> JOIN loan l ON b.loan_no = l.loan_no
+    -> WHERE l.amount < 100000;
+ERROR 1146 (42S02): Table 'flepr6.borrower' doesn't exist
+mysql> CREATE TABLE borrower (
+    ->     cust_name VARCHAR(100),
+    ->     loan_no INT,
+    ->     PRIMARY KEY (cust_name, loan_no),
+    ->     FOREIGN KEY (loan_no) REFERENCES loan(loan_no)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> show tables ;
++------------------+
+| Tables_in_flepr6 |
++------------------+
+| account          |
+| borrower         |
+| depositor        |
+| loan             |
++------------------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT b.cust_name
+    -> FROM borrower b
+    -> JOIN loan l ON b.loan_no = l.loan_no
+    -> WHERE l.amount < 100000;
+Empty set (0.00 sec)
+
+mysql> SELECT d.acc_no, d.cust_name
+    -> FROM depositor d
+    -> WHERE d.cust_name LIKE 'P%';
+Empty set (0.00 sec)
+
+mysql> SELECT d.cust_name, a.balance
+    -> FROM depositor d
+    -> JOIN account a ON d.acc_no = a.acc_no;
+Empty set (0.00 sec)
+
+mysql> SELECT b.cust_name
+    -> FROM borrower b
+    -> JOIN loan l ON b.loan_no = l.loan_no
+    -> WHERE l.branch_name = 'Redwood branch';
+Empty set (0.00 sec)
+
+mysql> SELECT DISTINCT d.cust_name
+    -> FROM depositor d
+    -> LEFT JOIN borrower b ON d.cust_name = b.cust_name
+    -> UNION
+    -> SELECT DISTINCT b.cust_name
+    -> FROM borrower b
+    -> LEFT JOIN depositor d ON b.cust_name = d.cust_name;
+Empty set (0.00 sec)
+
+mysql> SELECT d.cust_name
+    -> FROM depositor d
+    -> LEFT JOIN borrower b ON d.cust_name = b.cust_name
+    -> WHERE b.loan_no IS NULL;
+Empty set (0.00 sec)
+
+mysql> SELECT branch_name, AVG(balance) AS avg_balance
+    -> FROM account
+    -> GROUP BY branch_name;
+Empty set (0.00 sec)
+
+mysql> SELECT b.cust_name
+    ->
+    ->
+    -> FROM borrower b
+    -> JOIN loan l ON b.loan_no = l.loan_no
+    -> WHERE l.amount = (SELECT MAX(amount) FROM loan);
+Empty set (0.00 sec)
+
+mysql> commit;
+Query OK, 0 rows affected (0.00 sec)
