@@ -1,0 +1,269 @@
+--SQL Queries all types of Join, Sub-Query and View:
+Consider the given database schema:
+Student (studentid , studentname, instructorid, studentcity)
+Instructor(instructorid ,Instructorname, instructorcity, specialization)
+Use all types of Joins
+1.	Find the instructor of each student.
+2.	Find the student who is not having any instructor.
+3.	Find the student who is not having any instructor as well as the instructor who is not having a student.
+4.	List students and their instructors for a specific specialization (e.g., 'Computer Science').
+5.	Develop SQL query to find students whose city does not match with their instructor.
+6.	List All Instructors and Their Students (Including Without Students)
+7.	List of  students of each instructor who stays in Pune (Instructor)
+8.	Calculate the Average Number of Students per Instructor in Nashik
+9.	Create a view containing the total number of students whose instructor belongs to “Pune”. 
+10.	Write following queries on view
+a.	List All Specializations of Instructors in Pune
+b.	Count Students for Each Instructor in Pune
+c.	Find the Number of Students Grouped by Specialization of Instructors in Pune
+d.	List Instructors from Pune with No Students--
+
+mysql> create database assi2;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> use assi2;
+Database changed
+mysql> CREATE TABLE Student (
+    ->     studentid INT PRIMARY KEY,
+    ->     studentname VARCHAR(50),
+    ->     instructorid INT,
+    ->     studentcity VARCHAR(50)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql>
+mysql> CREATE TABLE Instructor (
+    ->     instructorid INT PRIMARY KEY,
+    ->     instructorname VARCHAR(50),
+    ->     instructorcity VARCHAR(50),
+    ->     specialization VARCHAR(50)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> INSERT INTO Instructor (instructorid, instructorname, instructorcity, specialization) VALUES
+    -> (1, 'John Smith', 'Pune', 'Computer Science'),
+    -> (2, 'Alice Brown', 'Mumbai', 'Mathematics'),
+    -> (3, 'David Lee', 'Nashik', 'Physics'),
+    -> (4, 'Sarah White', 'Pune', 'Biology'),
+    -> (5, 'Mike Johnson', 'Delhi', 'Computer Science'),
+    -> (6, 'Emma Wilson', 'Nashik', 'Chemistry');
+Query OK, 6 rows affected (0.01 sec)
+Records: 6  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO Student (studentid, studentname, instructorid, studentcity) VALUES
+    -> (101, 'Raj Shukla', 1, 'Pune'),
+    -> (102, 'Priya Singh', 2, 'Mumbai'),
+    -> (103, 'Anil Kumar', NULL, 'Nashik'),
+    -> (104, 'Neha Patil', 3, 'Nashik'),
+    -> (105, 'Amit Verma', 1, 'Delhi'),
+    -> (106, 'Reena Shah', 5, 'Kolkata'),
+    -> (107, 'Suresh Joshi', NULL, 'Pune');
+Query OK, 7 rows affected (0.01 sec)
+Records: 7  Duplicates: 0  Warnings: 0
+
+mysql> show tables;
++-----------------+
+| Tables_in_assi2 |
++-----------------+
+| instructor      |
+| student         |
++-----------------+
+2 rows in set (0.00 sec)
+
+mysql> select *  from instructor;
++--------------+----------------+----------------+------------------+
+| instructorid | instructorname | instructorcity | specialization   |
++--------------+----------------+----------------+------------------+
+|            1 | John Smith     | Pune           | Computer Science |
+|            2 | Alice Brown    | Mumbai         | Mathematics      |
+|            3 | David Lee      | Nashik         | Physics          |
+|            4 | Sarah White    | Pune           | Biology          |
+|            5 | Mike Johnson   | Delhi          | Computer Science |
+|            6 | Emma Wilson    | Nashik         | Chemistry        |
++--------------+----------------+----------------+------------------+
+6 rows in set (0.00 sec)
+
+mysql> select * from student;
++-----------+--------------+--------------+-------------+
+| studentid | studentname  | instructorid | studentcity |
++-----------+--------------+--------------+-------------+
+|       101 | Raj Shukla   |            1 | Pune        |
+|       102 | Priya Singh  |            2 | Mumbai      |
+|       103 | Anil Kumar   |         NULL | Nashik      |
+|       104 | Neha Patil   |            3 | Nashik      |
+|       105 | Amit Verma   |            1 | Delhi       |
+|       106 | Reena Shah   |            5 | Kolkata     |
+|       107 | Suresh Joshi |         NULL | Pune        |
++-----------+--------------+--------------+-------------+
+7 rows in set (0.00 sec)
+
+mysql> SELECT s.studentname, i.instructorname
+    -> FROM Student s
+    -> JOIN Instructor i ON s.instructorid = i.instructorid;
++-------------+----------------+
+| studentname | instructorname |
++-------------+----------------+
+| Raj Shukla  | John Smith     |
+| Priya Singh | Alice Brown    |
+| Neha Patil  | David Lee      |
+| Amit Verma  | John Smith     |
+| Reena Shah  | Mike Johnson   |
++-------------+----------------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT s.studentname
+    -> FROM Student s
+    -> LEFT JOIN Instructor i ON s.instructorid = i.instructorid
+    -> WHERE s.instructorid IS NULL;
++--------------+
+| studentname  |
++--------------+
+| Anil Kumar   |
+| Suresh Joshi |
++--------------+
+2 rows in set (0.00 sec)
+
+mysql> -- Students without an instructor
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> SELECT s.studentname
+    -> FROM Student s
+    -> LEFT JOIN Instructor i ON s.instructorid = i.instructorid
+    -> WHERE s.instructorid IS NULL
+    -> UNION
+    -> -- Instructors without students
+    -> SELECT i.instructorname
+    -> FROM Instructor i
+    -> LEFT JOIN Student s ON i.instructorid = s.instructorid
+    -> WHERE s.instructorid IS NULL;
++--------------+
+| studentname  |
++--------------+
+| Anil Kumar   |
+| Suresh Joshi |
+| Sarah White  |
+| Emma Wilson  |
++--------------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT s.studentname, i.instructorname
+    -> FROM Student s
+    -> JOIN Instructor i ON s.instructorid = i.instructorid
+    -> WHERE i.specialization = 'Computer Science';
++-------------+----------------+
+| studentname | instructorname |
++-------------+----------------+
+| Raj Shukla  | John Smith     |
+| Amit Verma  | John Smith     |
+| Reena Shah  | Mike Johnson   |
++-------------+----------------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT s.studentname, i.instructorname, s.studentcity, i.instructorcity
+    -> FROM Student s
+    -> JOIN Instructor i ON s.instructorid = i.instructorid
+    -> WHERE s.studentcity <> i.instructorcity;
++-------------+----------------+-------------+----------------+
+| studentname | instructorname | studentcity | instructorcity |
++-------------+----------------+-------------+----------------+
+| Amit Verma  | John Smith     | Delhi       | Pune           |
+| Reena Shah  | Mike Johnson   | Kolkata     | Delhi          |
++-------------+----------------+-------------+----------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT i.instructorname, s.studentname
+    -> FROM Instructor i
+    -> LEFT JOIN Student s ON i.instructorid = s.instructorid;
++----------------+-------------+
+| instructorname | studentname |
++----------------+-------------+
+| John Smith     | Amit Verma  |
+| John Smith     | Raj Shukla  |
+| Alice Brown    | Priya Singh |
+| David Lee      | Neha Patil  |
+| Sarah White    | NULL        |
+| Mike Johnson   | Reena Shah  |
+| Emma Wilson    | NULL        |
++----------------+-------------+
+7 rows in set (0.00 sec)
+
+mysql> SELECT s.studentname, i.instructorname
+    -> FROM Student s
+    -> JOIN Instructor i ON s.instructorid = i.instructorid
+    -> WHERE i.instructorcity = 'Pune';
++-------------+----------------+
+| studentname | instructorname |
++-------------+----------------+
+| Raj Shukla  | John Smith     |
+| Amit Verma  | John Smith     |
++-------------+----------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT AVG(student_count) AS avg_students_per_instructor
+    -> FROM (
+    ->     SELECT i.instructorid, COUNT(s.studentid) AS student_count
+    ->     FROM Instructor i
+    ->     LEFT JOIN Student s ON i.instructorid = s.instructorid
+    ->     WHERE i.instructorcity = 'Nashik'
+    ->     GROUP BY i.instructorid
+    -> ) AS subquery;
++-----------------------------+
+| avg_students_per_instructor |
++-----------------------------+
+|                      0.5000 |
++-----------------------------+
+1 row in set (0.00 sec)
+
+mysql> CREATE VIEW Pune_Instructors_Students AS
+    -> SELECT i.instructorname, COUNT(s.studentid) AS total_students
+    -> FROM Instructor i
+    -> JOIN Student s ON i.instructorid = s.instructorid
+    -> WHERE i.instructorcity = 'Pune'
+    -> GROUP BY i.instructorname;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> SELECT DISTINCT specialization
+    -> FROM Instructor
+    -> WHERE instructorcity = 'Pune';
++------------------+
+| specialization   |
++------------------+
+| Computer Science |
+| Biology          |
++------------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT instructorname, total_students
+    -> FROM Pune_Instructors_Students;
++----------------+----------------+
+| instructorname | total_students |
++----------------+----------------+
+| John Smith     |              2 |
++----------------+----------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT i.specialization, COUNT(s.studentid) AS total_students
+    -> FROM Instructor i
+    -> JOIN Student s ON i.instructorid = s.instructorid
+    -> WHERE i.instructorcity = 'Pune'
+    -> GROUP BY i.specialization;
++------------------+----------------+
+| specialization   | total_students |
++------------------+----------------+
+| Computer Science |              2 |
++------------------+----------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT i.instructorname
+    -> FROM Instructor i
+    -> LEFT JOIN Student s ON i.instructorid = s.instructorid
+    -> WHERE i.instructorcity = 'Pune' AND s.studentid IS NULL;
++----------------+
+| instructorname |
++----------------+
+| Sarah White    |
++----------------+
+1 row in set (0.00 sec)
+
+mysql> commit;
+Query OK, 0 rows affected (0.00 sec)
