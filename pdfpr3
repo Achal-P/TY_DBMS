@@ -1,0 +1,94 @@
+--Consider the following schema 
+account(acc-no,branch-name,balance) 
+depositor(cust-name,acc-no) 
+borrower (cust-name, loan-no) 
+loan (loan - no, branch - name, amount) 
+Write following queries using SQL 
+1. Create tables using proper primary keys --
+
+mysql> use filepr3;
+Database changed
+mysql> CREATE TABLE account (
+    ->     acc_no INT PRIMARY KEY,
+    ->     branch_name VARCHAR(50),
+    ->     balance DECIMAL(15, 2)
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql>
+    -> CREATE TABLE depositor (
+    ->     cust_name VARCHAR(100),
+    ->     acc_no INT,
+    ->     PRIMARY KEY (cust_name, acc_no),
+    ->     FOREIGN KEY (acc_no) REFERENCES account(acc_no)
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql>
+    -> CREATE TABLE borrower (
+    ->     cust_name VARCHAR(100),
+    ->     loan_no INT,
+    ->     PRIMARY KEY (cust_name, loan_no),
+    ->     FOREIGN KEY (loan_no) REFERENCES loan(loan_no)
+    -> );
+ERROR 1824 (HY000): Failed to open the referenced table 'loan'
+mysql>
+    -> CREATE TABLE loan (
+    ->     loan_no INT PRIMARY KEY,
+    ->     branch_name VARCHAR(50),
+    ->     amount DECIMAL(15, 2)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> UPDATE depositor
+    ->
+    ->
+    -> SET acc_no = 123456  -- change to a valid account number
+    -> WHERE cust_name = 'Customer Name'; -- change to the customer name you want to update
+Query OK, 0 rows affected (0.00 sec)
+Rows matched: 0  Changed: 0  Warnings: 0
+
+mysql> SELECT b.cust_name
+    -> FROM borrower b
+    -> JOIN loan l ON b.loan_no = l.loan_no
+    -> WHERE l.amount < 100000;
+ERROR 1146 (42S02): Table 'filepr3.borrower' doesn't exist
+mysql> CREATE TABLE borrow(
+    ->     ->     cust_name VARCHAR(100),
+    ->     ->     loan_no INT,
+    ->     ->     PRIMARY KEY (cust_name, loan_no),
+    ->     ->     FOREIGN KEY (loan_no) REFERENCES loan(loan_no)
+    ->     -> );
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '->     cust_name VARCHAR(100),
+    ->     loan_no INT,
+    ->     PRIMARY KEY (c' at line 2
+mysql> SELECT d.acc_no, d.cust_name
+    -> FROM depositor d
+    -> WHERE d.cust_name LIKE 'P%';
+Empty set (0.00 sec)
+
+mysql> SELECT d.cust_name, a.balance
+    -> FROM depositor d
+    -> JOIN account a ON d.acc_no = a.acc_no;
+Empty set (0.00 sec)
+
+mysql> SELECT b.cust_name
+    -> FROM borrower b
+    -> JOIN loan l ON b.loan_no = l.loan_no
+    -> WHERE l.branch_name = 'Redwood branch';
+ERROR 1146 (42S02): Table 'filepr3.borrower' doesn't exist
+mysql> SELECT DISTINCT d.cust_name
+    -> FROM depositor d
+    -> JOIN borrower b ON d.cust_name = b.cust_name
+    -> UNION
+    -> SELECT d.cust_name
+    -> FROM depositor d
+    -> UNION
+    -> SELECT b.cust_name
+    -> FROM borrower b;
+ERROR 1146 (42S02): Table 'filepr3.borrower' doesn't exist
+mysql> commit;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> create database filepr4;
+Query OK, 1 row affected (0.01 sec)
