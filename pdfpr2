@@ -1,0 +1,214 @@
+--SQL Queries: 
+    Consider the given Database Schema:  
+The "Customers" table contains information about the company's customers, including their 
+customer ID, name, email, and country. 
+The "Orders" table contains information about the orders made by the customers. Each order has 
+an order ID, customer ID (which corresponds to the customer who made the order), order date, 
+and total order amount. 
+1. Find order ids having total order amount more than 100000
+2. Find the Count number of customers from india 
+3. Find all orders made in Jan 2022--
+
+mysql> use fileq2;
+Database changed
+mysql> -- Create Customers Table
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> CREATE TABLE Customers (
+    ->     customer_id INT PRIMARY KEY,
+    ->     name VARCHAR(100),
+    ->     email VARCHAR(100) UNIQUE,
+    ->     country VARCHAR(50)
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql>
+mysql> -- Create Orders Table
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> CREATE TABLE Orders (
+    ->     order_id INT PRIMARY KEY,
+    ->     customer_id INT,
+    ->     order_date DATE,
+    ->     total_order_amount DECIMAL(10, 2),
+    ->     FOREIGN KEY (customer_id) REFERENCES Customers(customer_id)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> -- Insert data into Customers
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> INSERT INTO Customers (customer_id, name, email, country) VALUES
+    -> (1, 'Alice Johnson', 'alice@example.com', 'USA'),
+    -> (2, 'Bob Smith', 'bob@example.com', 'Canada'),
+    -> (3, 'Carlos Martinez', 'carlos@example.com', 'Mexico'),
+    -> (4, 'Diana Lee', 'diana@example.com', 'UK');
+Query OK, 4 rows affected (0.00 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql>
+mysql> -- Insert data into Orders
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> INSERT INTO Orders (order_id, customer_id, order_date, total_order_amount) VALUES
+    -> (101, 1, '2024-01-15', 250.75),
+    -> (102, 2, '2024-02-20', 125.50),
+    -> (103, 1, '2024-03-10', 300.00),
+    -> (104, 3, '2024-03-25', 450.00),
+    -> (105, 4, '2024-04-05', 150.00);
+Query OK, 5 rows affected (0.00 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> -- Insert more data into Orders with high order amounts
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> INSERT INTO Orders (order_id, customer_id, order_date, total_order_amount) VALUES
+    -> (106, 1, '2024-05-10', 150000.00),
+    -> (107, 2, '2024-06-15', 200000.00),
+    -> (108, 3, '2024-07-20', 300000.00),
+    -> (109, 4, '2024-08-25', 120000.00);
+Query OK, 4 rows affected (0.00 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql> show tables;
++------------------+
+| Tables_in_fileq2 |
++------------------+
+| customers        |
+| orders           |
++------------------+
+2 rows in set (0.00 sec)
+
+mysql> select * from orders;
++----------+-------------+------------+--------------------+
+| order_id | customer_id | order_date | total_order_amount |
++----------+-------------+------------+--------------------+
+|      101 |           1 | 2024-01-15 |             250.75 |
+|      102 |           2 | 2024-02-20 |             125.50 |
+|      103 |           1 | 2024-03-10 |             300.00 |
+|      104 |           3 | 2024-03-25 |             450.00 |
+|      105 |           4 | 2024-04-05 |             150.00 |
+|      106 |           1 | 2024-05-10 |          150000.00 |
+|      107 |           2 | 2024-06-15 |          200000.00 |
+|      108 |           3 | 2024-07-20 |          300000.00 |
+|      109 |           4 | 2024-08-25 |          120000.00 |
++----------+-------------+------------+--------------------+
+9 rows in set (0.00 sec)
+
+mysql> select * from customers;
++-------------+-----------------+--------------------+---------+
+| customer_id | name            | email              | country |
++-------------+-----------------+--------------------+---------+
+|           1 | Alice Johnson   | alice@example.com  | USA     |
+|           2 | Bob Smith       | bob@example.com    | Canada  |
+|           3 | Carlos Martinez | carlos@example.com | Mexico  |
+|           4 | Diana Lee       | diana@example.com  | UK      |
++-------------+-----------------+--------------------+---------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT order_id
+    -> FROM Orders
+    -> WHERE total_order_amount > 100000;
++----------+
+| order_id |
++----------+
+|      106 |
+|      107 |
+|      108 |
+|      109 |
++----------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT COUNT(*) AS count_of_customers
+    -> FROM Customers
+    -> WHERE country = 'India';
++--------------------+
+| count_of_customers |
++--------------------+
+|                  0 |
++--------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT order_id, customer_id, order_date, total_order_amount
+    -> FROM Orders
+    -> WHERE order_date BETWEEN '2022-01-01' AND '2022-01-31';
+Empty set (0.00 sec)
+
+mysql> SELECT customer_name
+    -> FROM Customers
+    -> WHERE customer_name LIKE 'S%';
+ERROR 1054 (42S22): Unknown column 'customer_name' in 'field list'
+mysql> ALTER TABLE Customers
+    -> ADD COLUMN customer_name VARCHAR(50);
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> -- Update existing customers with new names
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> UPDATE Customers SET customer_name = 'Alice Johnson' WHERE customer_id = 1;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> UPDATE Customers SET customer_name = 'Bob Smith' WHERE customer_id = 2;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> UPDATE Customers SET customer_name = 'Carlos Martinez' WHERE customer_id = 3;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> UPDATE Customers SET customer_name = 'Diana Lee' WHERE customer_id = 4;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql>
+mysql> -- Insert additional customers with names starting with 'S'
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> INSERT INTO Customers (customer_id, name, email, country, customer_name) VALUES
+    -> (5, 'Samuel Green', 'samuel@example.com', 'Australia', 'Samuel Green'),
+    -> (6, 'Sandra Brown', 'sandra@example.com', 'USA', 'Sandra Brown'),
+    -> (7, 'Steven Adams', 'steven@example.com', 'Canada', 'Steven Adams');
+Query OK, 3 rows affected (0.00 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> SELECT customer_name
+    -> FROM Customers
+    -> WHERE customer_name LIKE 'S%';
++---------------+
+| customer_name |
++---------------+
+| Samuel Green  |
+| Sandra Brown  |
+| Steven Adams  |
++---------------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT c.customer_name, c.email, COUNT(o.order_id) AS number_of_orders
+    -> FROM Customers c
+    -> JOIN Orders o ON c.customer_id = o.customer_id
+    -> GROUP BY c.customer_name, c.email;
++-----------------+--------------------+------------------+
+| customer_name   | email              | number_of_orders |
++-----------------+--------------------+------------------+
+| Alice Johnson   | alice@example.com  |                3 |
+| Bob Smith       | bob@example.com    |                2 |
+| Carlos Martinez | carlos@example.com |                2 |
+| Diana Lee       | diana@example.com  |                2 |
++-----------------+--------------------+------------------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT c.country, SUM(o.total_order_amount) AS total_revenue
+    -> FROM Customers c
+    -> JOIN Orders o ON c.customer_id = o.customer_id
+    -> GROUP BY c.country;
++---------+---------------+
+| country | total_revenue |
++---------+---------------+
+| USA     |     150550.75 |
+| Canada  |     200125.50 |
+| Mexico  |     300450.00 |
+| UK      |     120150.00 |
++---------+---------------+
+4 rows in set (0.00 sec)
